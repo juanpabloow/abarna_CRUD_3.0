@@ -1,18 +1,32 @@
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import CalendarView, { AgendaEvent } from '@/components/calendar-view'
+import { AgendasFilter } from '@/components/agendas-filter'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
 
 export const revalidate = 0
 
-export default async function AgendasPage() {
-  const { data: agendas } = await supabase
+export default async function AgendasPage({ searchParams }: { searchParams: Promise<{ cliente?: string, sede?: string, instalacion?: string }> }) {
+  const resolvedSearchParams = await searchParams
+  const { cliente, sede, instalacion } = resolvedSearchParams || {}
+
+  let query = supabase
     .from('agendas')
     .select(`
       *,
-      instalaciones(codigo, sedes(nombre_sede, clientes(nombre_empresa)))
+      instalaciones!inner(codigo, sede_id, sedes!inner(nombre_sede, nit_id, clientes(nombre_empresa)))
     `)
+
+  if (instalacion) {
+    query = query.eq('instalacion_id', instalacion)
+  } else if (sede) {
+    query = query.eq('instalaciones.sede_id', sede)
+  } else if (cliente) {
+    query = query.eq('instalaciones.sedes.nit_id', cliente)
+  }
+
+  const { data: agendas } = await query
 
   // Map to the format needed by react-big-calendar
   const eventos: AgendaEvent[] = (agendas || []).map(agenda => {
@@ -45,6 +59,8 @@ export default async function AgendasPage() {
           </Link>
         </Button>
       </div>
+
+      <AgendasFilter />
 
       <div className="flex-1 w-full">
         <CalendarView eventos={eventos} />

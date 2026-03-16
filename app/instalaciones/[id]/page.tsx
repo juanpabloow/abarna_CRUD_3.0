@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { updateInstalacion } from '../actions'
+import { InstalacionCascade } from '@/components/ui/cascade-selects'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { notFound } from 'next/navigation'
@@ -14,11 +15,9 @@ export default async function EditarInstalacionPage({ params }: { params: Promis
   const { id } = await params
   
   const [
-    { data: instalacion },
-    { data: sedes }
+    { data: instalacion }
   ] = await Promise.all([
-    supabase.from('instalaciones').select('*').eq('instalacion_id', id).single(),
-    supabase.from('sedes').select('sede_id, nombre_sede, clientes!inner(nombre_empresa), estados_crud!inner(estado_crud)').eq('estados_crud.estado_crud', 'Activo')
+    supabase.from('instalaciones').select('*, sedes(nit_id)').eq('instalacion_id', id).single()
   ])
 
   if (!instalacion) {
@@ -47,12 +46,10 @@ export default async function EditarInstalacionPage({ params }: { params: Promis
               <h3 className="text-lg font-medium border-b pb-2">Ubicación y Código</h3>
               
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="sede_id">Sede / Cliente <span className="text-red-500">*</span></Label>
-                  <select name="sede_id" id="sede_id" required defaultValue={instalacion.sede_id} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-                    {sedes?.map(s => <option key={s.sede_id} value={s.sede_id}>{(s as any).clientes?.nombre_empresa} - {s.nombre_sede}</option>)}
-                  </select>
-                </div>
+                <InstalacionCascade 
+                  defaultSedeId={instalacion.sede_id} 
+                  defaultClienteId={(instalacion as any).sedes?.nit_id}
+                />
                 <div className="space-y-2">
                   <Label htmlFor="codigo">Código Interno</Label>
                   <Input id="codigo" name="codigo" defaultValue={instalacion.codigo} disabled className="bg-slate-100" />

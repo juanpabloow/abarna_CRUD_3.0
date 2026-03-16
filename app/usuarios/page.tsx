@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { ClickableRow } from '@/components/ui/clickable-row'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
@@ -46,12 +47,12 @@ export default async function UsuariosPage() {
                 <TableHead>Email</TableHead>
                 <TableHead>Teléfono</TableHead>
                 <TableHead>Cédula</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
+                <TableHead className="text-center">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {usuarios?.map((usuario) => (
-                <TableRow key={usuario.usuario_id}>
+                <ClickableRow key={usuario.usuario_id} href={`?view=usuarios&id=${usuario.usuario_id}`}>
                   <TableCell className="font-medium">{usuario.nombre_completo}</TableCell>
                   <TableCell>
                     <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-slate-100 text-slate-800 capitalize">
@@ -61,7 +62,7 @@ export default async function UsuariosPage() {
                   <TableCell>{usuario.email || '-'}</TableCell>
                   <TableCell>{usuario.telefono || '-'}</TableCell>
                   <TableCell>{usuario.cedula || '-'}</TableCell>
-                  <TableCell className="text-right space-x-2">
+                  <TableCell className="text-center space-x-2">
                     <Button variant="ghost" size="icon" asChild>
                       <Link href={`/usuarios/${usuario.usuario_id}`}>
                         <Edit className="h-4 w-4 text-slate-500" />
@@ -76,7 +77,7 @@ export default async function UsuariosPage() {
                       </Button>
                     </form>
                   </TableCell>
-                </TableRow>
+                </ClickableRow>
               ))}
               {(!usuarios || usuarios.length === 0) && (
                 <TableRow>

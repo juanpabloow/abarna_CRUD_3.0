@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { ClickableRow } from '@/components/ui/clickable-row'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
@@ -15,7 +16,8 @@ export default async function ClientesPage() {
       *,
       tipo_personas!inner(tipo_persona),
       fuentes!inner(fuente),
-      estados_crud!inner(estado_crud)
+      estados_crud!inner(estado_crud),
+      cliente_usuarios(usuarios(nombre_completo))
     `)
     .eq('estados_crud.estado_crud', 'Activo')
     .order('created_at', { ascending: false })
@@ -42,20 +44,22 @@ export default async function ClientesPage() {
                 <TableHead>NIT / Documento</TableHead>
                 <TableHead>Nombre / Empresa</TableHead>
                 <TableHead>Tipo</TableHead>
-                <TableHead>Fuente</TableHead>
+                <TableHead>Correo de facturación</TableHead>
+                <TableHead>Contacto principal</TableHead>
                 <TableHead>Teléfono</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
+                <TableHead className="text-center">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {clientes?.map((cliente) => (
-                <TableRow key={cliente.nit_id}>
+                <ClickableRow key={cliente.nit_id} href={`?view=clientes&id=${cliente.nit_id}`}>
                   <TableCell className="font-medium">{cliente.nit_id}</TableCell>
                   <TableCell>{cliente.nombre_empresa}</TableCell>
                   <TableCell>{(cliente as any).tipo_personas?.tipo_persona}</TableCell>
-                  <TableCell>{(cliente as any).fuentes?.fuente}</TableCell>
+                  <TableCell>{cliente.email_empresa || '-'}</TableCell>
+                  <TableCell>{(cliente as any).cliente_usuarios?.[0]?.usuarios?.nombre_completo || 'Sin asignar'}</TableCell>
                   <TableCell>{cliente.telefono_empresa || '-'}</TableCell>
-                  <TableCell className="text-right space-x-2">
+                  <TableCell className="text-center space-x-2">
                     <Button variant="ghost" size="icon" asChild>
                       <Link href={`/clientes/${cliente.nit_id}`}>
                         <Edit className="h-4 w-4 text-slate-500" />
@@ -70,11 +74,11 @@ export default async function ClientesPage() {
                       </Button>
                     </form>
                   </TableCell>
-                </TableRow>
+                </ClickableRow>
               ))}
               {(!clientes || clientes.length === 0) && (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
                     No se encontraron clientes activos.
                   </TableCell>
                 </TableRow>

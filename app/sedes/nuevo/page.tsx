@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createSede } from '../actions'
+import { MultiUserSelect } from '@/components/ui/multi-user-select'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
@@ -12,12 +13,10 @@ export const revalidate = 0
 export default async function NuevaSedePage() {
   const [
     { data: clientes },
-    { data: ciudades },
-    { data: contactos }
+    { data: ciudades }
   ] = await Promise.all([
     supabase.from('clientes').select('nit_id, nombre_empresa, estados_crud!inner(estado_crud)').eq('estados_crud.estado_crud', 'Activo'),
-    supabase.from('ciudades').select('ciudad_id, ciudad, estados_crud!inner(estado_crud)').eq('estados_crud.estado_crud', 'Activo'),
-    supabase.from('usuarios').select('usuario_id, nombre_completo, email, estados_crud!inner(estado_crud)').eq('rol', 'cliente').eq('estados_crud.estado_crud', 'Activo')
+    supabase.from('ciudades').select('ciudad_id, ciudad, estados_crud!inner(estado_crud)').eq('estados_crud.estado_crud', 'Activo')
   ])
 
   return (
@@ -72,19 +71,8 @@ export default async function NuevaSedePage() {
               <h3 className="text-lg font-medium border-b pb-2">Encargados de Sede (Contactos)</h3>
               <p className="text-sm text-muted-foreground">Seleccione los usuarios que estarán a cargo de esta sede en específico.</p>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-48 overflow-y-auto p-4 border rounded-md bg-slate-50">
-                {contactos?.map(contacto => (
-                  <label key={contacto.usuario_id} className="flex items-center space-x-3 bg-white p-3 rounded-md border shadow-sm cursor-pointer hover:bg-slate-50">
-                    <input type="checkbox" name="assigned_users" value={contacto.usuario_id} className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-600" />
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">{contacto.nombre_completo}</span>
-                      <span className="text-xs text-muted-foreground">{contacto.email || 'Sin correo'}</span>
-                    </div>
-                  </label>
-                ))}
-                {(!contactos || contactos.length === 0) && (
-                  <p className="text-sm text-muted-foreground col-span-2">No hay contactos creados en el sistema.</p>
-                )}
+              <div className="pt-2">
+                <MultiUserSelect roleFilter="cliente" fieldName="assigned_users" />
               </div>
             </div>
 

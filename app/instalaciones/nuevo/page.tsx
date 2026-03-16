@@ -4,16 +4,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { createInstalacion } from '../actions'
+import { InstalacionCascade } from '@/components/ui/cascade-selects'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
 export const revalidate = 0
 
 export default async function NuevaInstalacionPage() {
-  const { data: sedes } = await supabase
-    .from('sedes')
-    .select('sede_id, nombre_sede, clientes!inner(nombre_empresa), estados_crud!inner(estado_crud)')
-    .eq('estados_crud.estado_crud', 'Activo')
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
@@ -35,13 +32,7 @@ export default async function NuevaInstalacionPage() {
               <h3 className="text-lg font-medium border-b pb-2">Ubicación y Código</h3>
               
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="sede_id">Sede / Cliente <span className="text-red-500">*</span></Label>
-                  <select defaultValue="" name="sede_id" id="sede_id" required className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-                    <option value="" disabled>Seleccione la sede...</option>
-                    {sedes?.map(s => <option key={s.sede_id} value={s.sede_id}>{(s as any).clientes?.nombre_empresa} - {s.nombre_sede}</option>)}
-                  </select>
-                </div>
+                <InstalacionCascade />
                 <div className="space-y-2">
                   <Label htmlFor="codigo">Código Interno</Label>
                   <Input id="codigo" name="codigo" placeholder="Ej. T-1234 (Generado autom. si se omite)" />

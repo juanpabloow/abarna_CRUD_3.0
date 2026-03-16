@@ -54,7 +54,7 @@ export default function CalendarView({ eventos }: { eventos: AgendaEvent[] }) {
   }
 
   const handleSelectEvent = (event: AgendaEvent) => {
-    router.push(`/agendas/${event.id}`)
+    router.push(`?view=agendas&id=${event.id}`, { scroll: false })
   }
 
   const eventPropGetter = (event: AgendaEvent) => {

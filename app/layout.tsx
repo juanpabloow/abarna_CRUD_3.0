@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { AppSidebar } from '@/components/app-sidebar'
+import { GlobalModals } from '@/components/global-modals'
+import { Suspense } from 'react'
 
 export const metadata: Metadata = {
   title: 'Abarna Admin',
@@ -26,6 +28,9 @@ export default function RootLayout({
             </main>
           </div>
         </div>
+        <Suspense fallback={null}>
+          <GlobalModals />
+        </Suspense>
       </body>
     </html>
   )

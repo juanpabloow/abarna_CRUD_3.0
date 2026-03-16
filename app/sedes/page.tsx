@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { ClickableRow } from '@/components/ui/clickable-row'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import Link from 'next/link'
@@ -15,7 +16,8 @@ export default async function SedesPage() {
       *,
       ciudades!inner(ciudad),
       clientes!inner(nombre_empresa),
-      estados_crud!inner(estado_crud)
+      estados_crud!inner(estado_crud),
+      sede_usuarios(usuarios(nombre_completo))
     `)
     .eq('estados_crud.estado_crud', 'Activo')
     .order('created_at', { ascending: false })
@@ -43,17 +45,19 @@ export default async function SedesPage() {
                 <TableHead>Empresa (Cliente)</TableHead>
                 <TableHead>Ciudad</TableHead>
                 <TableHead>Dirección</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
+                <TableHead>Usuario asignado</TableHead>
+                <TableHead className="text-center">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {sedes?.map((sede) => (
-                <TableRow key={sede.sede_id}>
+                <ClickableRow key={sede.sede_id} href={`?view=sedes&id=${sede.sede_id}`}>
                   <TableCell className="font-medium">{sede.nombre_sede}</TableCell>
                   <TableCell>{(sede as any).clientes?.nombre_empresa}</TableCell>
                   <TableCell>{(sede as any).ciudades?.ciudad}</TableCell>
                   <TableCell>{sede.direccion || '-'}</TableCell>
-                  <TableCell className="text-right space-x-2">
+                  <TableCell>{(sede as any).sede_usuarios?.[0]?.usuarios?.nombre_completo || 'Sin asignar'}</TableCell>
+                  <TableCell className="text-center space-x-2">
                     <Button variant="ghost" size="icon" asChild>
                       <Link href={`/sedes/${sede.sede_id}`}>
                         <Edit className="h-4 w-4 text-slate-500" />
@@ -68,11 +72,11 @@ export default async function SedesPage() {
                       </Button>
                     </form>
                   </TableCell>
-                </TableRow>
+                </ClickableRow>
               ))}
               {(!sedes || sedes.length === 0) && (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                     No se encontraron sedes activas.
                   </TableCell>
                 </TableRow>
