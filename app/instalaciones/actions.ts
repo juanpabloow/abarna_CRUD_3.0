@@ -1,10 +1,11 @@
 'use server'
 
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 export async function createInstalacion(formData: FormData) {
+  const supabase = await createClient()
   const { data: estadoData } = await supabase
     .from('estados_crud')
     .select('estado_crud_id')
@@ -36,6 +37,7 @@ export async function createInstalacion(formData: FormData) {
 }
 
 export async function updateInstalacion(id: string, formData: FormData) {
+  const supabase = await createClient()
   const updatedInstalacion = {
     sede_id: formData.get('sede_id'),
     codigo: formData.get('codigo')?.toString(),
@@ -63,6 +65,7 @@ export async function updateInstalacion(id: string, formData: FormData) {
 }
 
 export async function deleteInstalacion(id: string) {
+  const supabase = await createClient()
   const { data: estadoData } = await supabase
     .from('estados_crud')
     .select('estado_crud_id')

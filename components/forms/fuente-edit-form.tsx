@@ -1,16 +1,14 @@
 'use client'
 
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { updateUsuarioModal, deleteUsuarioModal } from '@/app/actions/modal-actions'
+import { updateFuenteModal, deleteFuenteModal } from '@/app/actions/modal-actions'
 import { Trash2 } from 'lucide-react'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 
-const selectClass = "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-
-export function UsuarioEditForm({ usuario, onSuccess }: { usuario: any; onSuccess: () => void }) {
+export function FuenteEditForm({ fuente, onSuccess }: { fuente: any; onSuccess: () => void }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -19,7 +17,7 @@ export function UsuarioEditForm({ usuario, onSuccess }: { usuario: any; onSucces
     e.preventDefault()
     setLoading(true)
     try {
-      await updateUsuarioModal(usuario.usuario_id, new FormData(e.currentTarget))
+      await updateFuenteModal(fuente.fuente_id, new FormData(e.currentTarget))
       router.refresh()
       onSuccess()
     } finally {
@@ -30,7 +28,7 @@ export function UsuarioEditForm({ usuario, onSuccess }: { usuario: any; onSucces
   const handleDelete = async () => {
     setLoading(true)
     try {
-      await deleteUsuarioModal(usuario.usuario_id)
+      await deleteFuenteModal(fuente.fuente_id)
       router.refresh()
       onSuccess()
     } finally {
@@ -41,28 +39,8 @@ export function UsuarioEditForm({ usuario, onSuccess }: { usuario: any; onSucces
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="nombre_completo">Nombre Completo <span className="text-red-500">*</span></Label>
-        <Input id="nombre_completo" name="nombre_completo" required defaultValue={usuario.nombre_completo} />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <Input id="email" name="email" type="email" defaultValue={usuario.email || ''} />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="telefono">Teléfono</Label>
-        <Input id="telefono" name="telefono" defaultValue={usuario.telefono || ''} />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="cedula">Cédula</Label>
-        <Input id="cedula" name="cedula" defaultValue={usuario.cedula || ''} />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="rol">Rol <span className="text-red-500">*</span></Label>
-        <select name="rol" id="rol" required defaultValue={usuario.rol} className={selectClass}>
-          <option value="cliente">Cliente</option>
-          <option value="tecnico">Técnico</option>
-          <option value="administrador">Administrador</option>
-        </select>
+        <Label htmlFor="fuente">Nombre de la Fuente <span className="text-red-500">*</span></Label>
+        <Input id="fuente" name="fuente" required defaultValue={fuente.fuente} />
       </div>
 
       <div className="flex justify-between items-center pt-4 border-t">

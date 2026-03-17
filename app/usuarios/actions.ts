@@ -1,10 +1,11 @@
 'use server'
 
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 export async function createUsuario(formData: FormData) {
+  const supabase = await createClient()
   const { data: estadoData } = await supabase
     .from('estados_crud')
     .select('estado_crud_id')
@@ -31,6 +32,7 @@ export async function createUsuario(formData: FormData) {
 }
 
 export async function updateUsuario(id: string, formData: FormData): Promise<void> {
+  const supabase = await createClient()
   const updatedUsuario = {
     nombre_completo: formData.get('nombre_completo'),
     cedula: formData.get('cedula')?.toString() || null,
@@ -54,7 +56,7 @@ export async function updateUsuario(id: string, formData: FormData): Promise<voi
 }
 
 export async function deleteUsuario(id: string) {
-  // Soft Delete: change estado to Eliminado
+  const supabase = await createClient()
   const { data: estadoData } = await supabase
     .from('estados_crud')
     .select('estado_crud_id')
@@ -66,7 +68,7 @@ export async function deleteUsuario(id: string) {
       .from('usuarios')
       .update({ estado_crud_id: estadoData.estado_crud_id })
       .eq('usuario_id', id)
-      
+
     revalidatePath('/usuarios')
   }
 }

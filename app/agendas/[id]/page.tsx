@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,13 +8,14 @@ import { MultiUserSelect } from '@/components/ui/multi-user-select'
 import { AgendaCascade } from '@/components/ui/cascade-selects'
 import Link from 'next/link'
 import { ArrowLeft, Trash2 } from 'lucide-react'
+import { SubmitButton } from '@/components/ui/submit-button'
 import { notFound } from 'next/navigation'
 
 export const revalidate = 0
 
 export default async function EditarAgendaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  
+  const supabase = await createClient()
   const [
     { data: agenda },
     { data: assignedData }
@@ -127,7 +128,7 @@ export default async function EditarAgendaPage({ params }: { params: Promise<{ i
               <Button variant="outline" type="button" asChild>
                 <Link href="/agendas">Cancelar</Link>
               </Button>
-              <Button type="submit">Actualizar Agenda</Button>
+              <SubmitButton pendingText="Guardando...">Actualizar Agenda</SubmitButton>
             </div>
           </form>
         </CardContent>

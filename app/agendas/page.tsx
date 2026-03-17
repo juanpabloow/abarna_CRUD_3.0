@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import CalendarView, { AgendaEvent } from '@/components/calendar-view'
 import { AgendasFilter } from '@/components/agendas-filter'
@@ -11,6 +11,7 @@ export default async function AgendasPage({ searchParams }: { searchParams: Prom
   const resolvedSearchParams = await searchParams
   const { cliente, sede, instalacion } = resolvedSearchParams || {}
 
+  const supabase = await createClient()
   let query = supabase
     .from('agendas')
     .select(`
@@ -28,11 +29,16 @@ export default async function AgendasPage({ searchParams }: { searchParams: Prom
 
   const { data: agendas } = await query
 
+  // Strip the timezone offset so the stored time is treated as local time.
+  // The datetime-local input submits without tz info; Supabase stores it as UTC.
+  // Parsing without the offset prevents the browser from shifting the hour.
+  const parseAsLocal = (dateStr: string) =>
+    new Date(dateStr.replace(/([+-]\d{2}:?\d{2}|Z)$/, ''))
+
   // Map to the format needed by react-big-calendar
   const eventos: AgendaEvent[] = (agendas || []).map(agenda => {
-    // Treat as a 2-hour event for visual representation if no valid time range natively
-    const startDate = new Date(agenda.fecha_visita)
-    const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000) 
+    const startDate = parseAsLocal(agenda.fecha_visita)
+    const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000)
 
     const clienteName = (agenda as any).instalaciones?.sedes?.clientes?.nombre_empresa || 'Sin Cliente'
     const sedeName = (agenda as any).instalaciones?.sedes?.nombre_sede || ''

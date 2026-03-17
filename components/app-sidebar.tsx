@@ -9,6 +9,7 @@ import {
   Map as MapIcon
 } from 'lucide-react'
 import Link from 'next/link'
+import { LogoutButton } from '@/components/logout-button'
 
 const mainNavItems = [
   { name: 'Dashboard', url: '/', icon: LayoutDashboard },
@@ -70,6 +71,9 @@ export function AppSidebar() {
             ))}
           </ul>
         </div>
+      </div>
+      <div className="p-4 border-t">
+        <LogoutButton />
       </div>
     </aside>
   )

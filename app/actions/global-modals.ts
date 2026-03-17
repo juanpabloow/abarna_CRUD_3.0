@@ -1,8 +1,9 @@
 'use server'
 
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 
 export async function getEntityDetail(view: string, id: string) {
+  const supabase = await createClient()
   switch (view) {
     case 'clientes': {
       const { data } = await supabase
@@ -80,13 +81,29 @@ export async function getEntityDetail(view: string, id: string) {
           *,
           instalaciones(
             instalacion_id, codigo,
-            sedes(sede_id, nombre_sede)
+            sedes(sede_id, nombre_sede, nit_id, clientes(nit_id, nombre_empresa))
           ),
           agenda_tecnico(
-            usuarios(usuario_id, nombre_completo)
+            usuarios(usuario_id, nombre_completo, email)
           )
         `)
         .eq('agenda_id', id)
+        .single()
+      return data
+    }
+    case 'fuentes': {
+      const { data } = await supabase
+        .from('fuentes')
+        .select('fuente_id, fuente')
+        .eq('fuente_id', id)
+        .single()
+      return data
+    }
+    case 'ciudades': {
+      const { data } = await supabase
+        .from('ciudades')
+        .select('ciudad_id, ciudad')
+        .eq('ciudad_id', id)
         .single()
       return data
     }

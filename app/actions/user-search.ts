@@ -1,15 +1,13 @@
 'use server'
 
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 
 export async function searchUsuarios(query: string, rol?: string) {
+  const supabase = await createClient()
   let dbQuery = supabase
     .from('usuarios')
-    .select('usuario_id, nombre_completo, email, rol')
+    .select('*, estados_crud!inner(estado_crud)')
     .eq('estados_crud.estado_crud', 'Activo')
-    
-  // Subquery for active status filter
-  dbQuery = dbQuery.select('*, estados_crud!inner(estado_crud)')
 
   if (rol) {
     dbQuery = dbQuery.eq('rol', rol)
@@ -20,6 +18,6 @@ export async function searchUsuarios(query: string, rol?: string) {
   }
 
   const { data } = await dbQuery.limit(10)
-  
+
   return data || []
 }

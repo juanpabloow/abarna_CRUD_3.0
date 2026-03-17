@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,6 +10,7 @@ import { notFound } from 'next/navigation'
 
 export default async function EditarUsuarioPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const supabase = await createClient()
   const { data: usuario } = await supabase
     .from('usuarios')
     .select('*')

@@ -1,10 +1,11 @@
 'use server'
 
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 export async function createFuente(formData: FormData) {
+  const supabase = await createClient()
   const { data: estadoData } = await supabase
     .from('estados_crud')
     .select('estado_crud_id')
@@ -24,6 +25,7 @@ export async function createFuente(formData: FormData) {
 }
 
 export async function updateFuente(id: string, formData: FormData) {
+  const supabase = await createClient()
   const updatedRecord = {
     fuente: formData.get('fuente')?.toString(),
   }
@@ -36,6 +38,7 @@ export async function updateFuente(id: string, formData: FormData) {
 }
 
 export async function deleteFuente(id: string) {
+  const supabase = await createClient()
   const { data: estadoData } = await supabase.from('estados_crud').select('estado_crud_id').eq('estado_crud', 'Eliminado').single()
   if (estadoData) {
     await supabase.from('fuentes').update({ estado_crud_id: estadoData.estado_crud_id }).eq('fuente_id', id)

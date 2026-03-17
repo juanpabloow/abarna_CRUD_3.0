@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { ClickableRow } from '@/components/ui/clickable-row'
 import { Button } from '@/components/ui/button'
@@ -10,6 +10,7 @@ import { deleteCliente } from './actions'
 export const revalidate = 0
 
 export default async function ClientesPage() {
+  const supabase = await createClient()
   const { data: clientes } = await supabase
     .from('clientes')
     .select(`

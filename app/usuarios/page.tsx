@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import {
   Table,
   TableBody,
@@ -14,9 +14,25 @@ import Link from 'next/link'
 import { Plus, Edit, Trash2 } from 'lucide-react'
 import { deleteUsuario } from './actions'
 
+const rolStyles: Record<string, string> = {
+  admin:    'bg-green-100 text-green-800',
+  cliente:  'bg-yellow-100 text-yellow-800',
+  tecnico:  'bg-blue-100 text-blue-800',
+}
+
+function RoleBadge({ rol }: { rol: string }) {
+  const colorClass = rolStyles[rol?.toLowerCase()] ?? 'bg-slate-100 text-slate-800'
+  return (
+    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${colorClass}`}>
+      {rol}
+    </span>
+  )
+}
+
 export const revalidate = 0
 
 export default async function UsuariosPage() {
+  const supabase = await createClient()
   const { data: usuarios } = await supabase
     .from('usuarios')
     .select('*, estados_crud!inner(estado_crud)')
@@ -55,9 +71,7 @@ export default async function UsuariosPage() {
                 <ClickableRow key={usuario.usuario_id} href={`?view=usuarios&id=${usuario.usuario_id}`}>
                   <TableCell className="font-medium">{usuario.nombre_completo}</TableCell>
                   <TableCell>
-                    <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-slate-100 text-slate-800 capitalize">
-                      {usuario.rol}
-                    </span>
+                    <RoleBadge rol={usuario.rol} />
                   </TableCell>
                   <TableCell>{usuario.email || '-'}</TableCell>
                   <TableCell>{usuario.telefono || '-'}</TableCell>

@@ -1,8 +1,9 @@
 'use server'
 
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 
 export async function getClientesForFilter() {
+  const supabase = await createClient()
   const { data } = await supabase
     .from('clientes')
     .select('nit_id, nombre_empresa, estados_crud!inner(estado_crud)')
@@ -11,6 +12,7 @@ export async function getClientesForFilter() {
 }
 
 export async function getSedesForFilter(clienteId?: string) {
+  const supabase = await createClient()
   let query = supabase
     .from('sedes')
     .select('sede_id, nombre_sede, estados_crud!inner(estado_crud)')
@@ -25,6 +27,7 @@ export async function getSedesForFilter(clienteId?: string) {
 }
 
 export async function getInstalacionesForFilter(sedeId?: string) {
+  const supabase = await createClient()
   let query = supabase
     .from('instalaciones')
     .select('instalacion_id, codigo, estados_crud!inner(estado_crud)')

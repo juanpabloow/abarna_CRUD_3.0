@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { ClickableRow } from '@/components/ui/clickable-row'
 import { Button } from '@/components/ui/button'
@@ -14,6 +14,7 @@ export default async function InstalacionesPage({ searchParams }: { searchParams
   const resolvedSearchParams = await searchParams
   const { cliente, sede } = resolvedSearchParams || {}
 
+  const supabase = await createClient()
   let query = supabase
     .from('instalaciones')
     .select(`

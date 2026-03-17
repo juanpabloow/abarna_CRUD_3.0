@@ -1,4 +1,3 @@
-import { supabase } from '@/lib/supabase'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -8,6 +7,7 @@ import { MultiUserSelect } from '@/components/ui/multi-user-select'
 import { AgendaCascade } from '@/components/ui/cascade-selects'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import { SubmitButton } from '@/components/ui/submit-button'
 
 export const revalidate = 0
 
@@ -95,7 +95,7 @@ export default async function NuevaAgendaPage({ searchParams }: { searchParams: 
               <Button variant="outline" type="button" asChild>
                 <Link href="/agendas">Cancelar</Link>
               </Button>
-              <Button type="submit">Guardar Agenda</Button>
+              <SubmitButton pendingText="Guardando...">Guardar Agenda</SubmitButton>
             </div>
           </form>
         </CardContent>

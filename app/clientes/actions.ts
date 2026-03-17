@@ -1,10 +1,11 @@
 'use server'
 
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 export async function createCliente(formData: FormData) {
+  const supabase = await createClient()
   const { data: estadoData } = await supabase
     .from('estados_crud')
     .select('estado_crud_id')
@@ -29,7 +30,6 @@ export async function createCliente(formData: FormData) {
     throw new Error(clienteError.message)
   }
 
-  // Insert assigned users if any
   if (assignedUsers.length > 0) {
     const relationships = assignedUsers.map(userId => ({
       nit_id: newCliente.nit_id,
@@ -48,6 +48,7 @@ export async function createCliente(formData: FormData) {
 }
 
 export async function updateCliente(nitId: string, formData: FormData) {
+  const supabase = await createClient()
   const { data: estadoData } = await supabase
     .from('estados_crud')
     .select('estado_crud_id')
@@ -74,11 +75,8 @@ export async function updateCliente(nitId: string, formData: FormData) {
     throw new Error(clienteError.message)
   }
 
-  // Handle Junction Table (cliente_usuarios)
-  // Delete all existing bindings
   await supabase.from('cliente_usuarios').delete().eq('nit_id', nitId)
 
-  // Re-insert exact matching bindings
   if (assignedUsers.length > 0) {
     const relationships = assignedUsers.map(userId => ({
       nit_id: nitId,
@@ -97,6 +95,7 @@ export async function updateCliente(nitId: string, formData: FormData) {
 }
 
 export async function deleteCliente(nitId: string) {
+  const supabase = await createClient()
   const { data: estadoData } = await supabase
     .from('estados_crud')
     .select('estado_crud_id')

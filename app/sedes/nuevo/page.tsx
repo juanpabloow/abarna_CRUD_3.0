@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,6 +11,7 @@ import { ArrowLeft } from 'lucide-react'
 export const revalidate = 0
 
 export default async function NuevaSedePage() {
+  const supabase = await createClient()
   const [
     { data: clientes },
     { data: ciudades }

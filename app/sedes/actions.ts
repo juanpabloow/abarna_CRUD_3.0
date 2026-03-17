@@ -1,10 +1,11 @@
 'use server'
 
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 export async function createSede(formData: FormData) {
+  const supabase = await createClient()
   const { data: estadoData } = await supabase
     .from('estados_crud')
     .select('estado_crud_id')
@@ -21,7 +22,6 @@ export async function createSede(formData: FormData) {
     estado_crud_id: estadoData?.estado_crud_id
   }
 
-  // Use raw array mapped to object if needed for insert
   const { data: insertData, error: sedeError } = await supabase
     .from('sedes')
     .insert([newSede])
@@ -33,7 +33,6 @@ export async function createSede(formData: FormData) {
     throw new Error(sedeError?.message || 'Failed to create')
   }
 
-  // Insert assigned users if any for sede_usuarios
   if (assignedUsers.length > 0) {
     const relationships = assignedUsers.map(userId => ({
       sede_id: insertData.sede_id,
@@ -52,6 +51,7 @@ export async function createSede(formData: FormData) {
 }
 
 export async function updateSede(sedeId: string, formData: FormData) {
+  const supabase = await createClient()
   const { data: estadoData } = await supabase
     .from('estados_crud')
     .select('estado_crud_id')
@@ -77,7 +77,6 @@ export async function updateSede(sedeId: string, formData: FormData) {
     throw new Error(sedeError.message)
   }
 
-  // Handle Junction Table (sede_usuarios)
   await supabase.from('sede_usuarios').delete().eq('sede_id', sedeId)
 
   if (assignedUsers.length > 0) {
@@ -98,6 +97,7 @@ export async function updateSede(sedeId: string, formData: FormData) {
 }
 
 export async function deleteSede(sedeId: string) {
+  const supabase = await createClient()
   const { data: estadoData } = await supabase
     .from('estados_crud')
     .select('estado_crud_id')

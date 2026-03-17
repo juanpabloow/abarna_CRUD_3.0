@@ -1,10 +1,11 @@
 'use server'
 
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 export async function createAgenda(formData: FormData) {
+  const supabase = await createClient()
   const assignedTecnicos = formData.getAll('assigned_tecnicos') as string[]
 
   const newAgenda = {
@@ -26,7 +27,6 @@ export async function createAgenda(formData: FormData) {
     throw new Error(agendaError?.message || 'Failed to create')
   }
 
-  // Insert assigned tecnicos
   if (assignedTecnicos.length > 0) {
     const relationships = assignedTecnicos.map(userId => ({
       agenda_id: insertData.agenda_id,
@@ -43,6 +43,7 @@ export async function createAgenda(formData: FormData) {
 }
 
 export async function updateAgenda(agendaId: string, formData: FormData) {
+  const supabase = await createClient()
   const assignedTecnicos = formData.getAll('assigned_tecnicos') as string[]
 
   const updatedAgenda = {
@@ -63,10 +64,8 @@ export async function updateAgenda(agendaId: string, formData: FormData) {
     throw new Error(agendaError.message)
   }
 
-  // Delete all bindings
   await supabase.from('agenda_tecnico').delete().eq('agenda_id', agendaId)
 
-  // Re-insert exact matching bindings
   if (assignedTecnicos.length > 0) {
     const relationships = assignedTecnicos.map(userId => ({
       agenda_id: agendaId,
@@ -83,7 +82,7 @@ export async function updateAgenda(agendaId: string, formData: FormData) {
 }
 
 export async function deleteAgenda(agendaId: string) {
-  // Hard delete is okay for agendas or we can just cancel it
+  const supabase = await createClient()
   const { error } = await supabase.from('agendas').delete().eq('agenda_id', agendaId)
   if (error) {
     console.error(error)

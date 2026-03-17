@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,7 +11,7 @@ import { ArrowLeft } from 'lucide-react'
 export const revalidate = 0
 
 export default async function NuevoClientePage() {
-  // Use direct simple fetch
+  const supabase = await createClient()
   const { data: tp } = await supabase.from('tipo_personas').select('tipo_persona_id, tipo_persona, estados_crud!inner(estado_crud)').eq('estados_crud.estado_crud', 'Activo')
   const { data: ft } = await supabase.from('fuentes').select('fuente_id, fuente, estados_crud!inner(estado_crud)').eq('estados_crud.estado_crud', 'Activo')
 

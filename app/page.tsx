@@ -1,10 +1,11 @@
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Users, Briefcase, MapPin, Droplet, Calendar as CalendarIcon, Wrench } from 'lucide-react'
 
 export const revalidate = 0 // Disable cache for live dashboard
 
 export default async function DashboardPage() {
+  const supabase = await createClient()
   const [
     { count: clientesCount },
     { count: sedesCount },
